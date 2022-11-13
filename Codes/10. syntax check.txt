@@ -1,0 +1,72 @@
+﻿.l file
+
+
+%{
+#include"y.tab.h"
+%}
+%%
+if {return IF;}
+[A-Aa-z0-9]+ {return ID;}
+. {return yytext[0];}
+%%
+int yywrap()
+{
+return 1;
+}
+
+
+.y file
+
+
+%{
+#include "stdio.h"
+#include "math.h"
+%}
+
+
+%union {char *text;}
+%start S
+%token <text> ID
+%token IF
+
+
+%%
+S : IF '('condition')''{'block'}' {printf("valid");}
+;
+condition : ID '<' ID
+      | ID '>' ID
+      ;
+block : E
+          | block E
+          ;
+E : ID '+' ID
+  | ID '=' E
+  | ID
+  ;
+%%
+
+
+int main()
+{
+yyparse();
+return 0;
+}
+
+
+int yyerror()
+{
+exit(0);
+}        
+
+
+
+
+Input:
+Flex filename.l
+Yacc -d filename.y
+Gcc lex.yy.c y.tab.c
+./a.out
+
+if(4<7){1+2}
+Valid
+if(4)
